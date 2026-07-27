@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRU · Guía de Referencia Técnica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-900:#101d35;
+    --navy-800:#16294d;
+    --navy-700:#24417a;
+    --navy-600:#2e4f96;
+    --lime-500:#a9c23f;
+    --lime-600:#8fa832;
+    --lime-100:#eef3d9;
+    --cream-50:#f7f6f1;
+    --paper:#ffffff;
+    --ink:#1c1e1b;
+    --ink-soft:#5b6158;
+    --ink-faint:#8b8f85;
+    --line:#e4e3da;
+    --red-500:#c1443b;
+    --red-bg:#fbeae7;
+    --shadow-sm:0 1px 2px rgba(16,29,53,.06);
+    --shadow-md:0 6px 20px rgba(16,29,53,.10);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream-50);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4,.display{
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+
+  /* ===== Background texture ===== */
+  .circuit-bg{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:.35;
+    mask-image:linear-gradient(180deg, rgba(0,0,0,.5), transparent 320px);
+  }
+
+  /* ===== Header ===== */
+  header.topbar{
+    position:sticky; top:0; z-index:30;
+    background:var(--navy-900);
+    color:#fff;
+    border-bottom:3px solid var(--lime-500);
+  }
+  .topbar-inner{
+    max-width:1280px; margin:0 auto;
+    padding:14px 24px;
+    display:flex; align-items:center; gap:20px;
+  }
+  .brand{display:flex; align-items:center; gap:12px; flex-shrink:0;}
+  .brand-mark{display:flex; align-items:baseline; font-family:'Space Grotesk'; font-weight:700; font-size:28px; line-height:1;}
+  .brand-mark .h, .brand-mark .r{color:#fff;}
+  .brand-mark .u{color:var(--lime-500);}
+  .brand-text{display:flex; flex-direction:column; line-height:1.15;}
+  .brand-text .tag{font-size:11px; color:var(--lime-500); font-weight:600; letter-spacing:.06em; text-transform:uppercase;}
+  .brand-text .sub{font-size:11px; color:#aab4c8;}
+
+  .menu-toggle{
+    display:none; background:none; border:1px solid rgba(255,255,255,.25); color:#fff;
+    width:38px; height:38px; border-radius:8px; align-items:center; justify-content:center; cursor:pointer;
+  }
+
+  .search-wrap{flex:1; max-width:520px; margin-left:auto; position:relative;}
+  .search-wrap input{
+    width:100%; padding:10px 14px 10px 40px; border-radius:10px; border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.08); color:#fff; font-size:14px; outline:none;
+  }
+  .search-wrap input::placeholder{color:#96a1b8;}
+  .search-wrap input:focus{border-color:var(--lime-500); background:rgba(255,255,255,.12);}
+  .search-wrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:#96a1b8;}
+
+  /* ===== Layout ===== */
+  .layout{max-width:1280px; margin:0 auto; display:flex; gap:28px; padding:24px;}
+  aside.sidenav{
+    width:280px; flex-shrink:0;
+  }
+  .sidenav-inner{position:sticky; top:88px;}
+  main.content{flex:1; min-width:0; padding-bottom:80px;}
+
+  .sidenav-section{margin-bottom:22px;}
+  .sidenav-cat-btn{
+    width:100%; text-align:left; display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px; border:1px solid transparent; cursor:pointer;
+    background:transparent; font-weight:600; font-size:14px; color:var(--navy-800);
+  }
+  .sidenav-cat-btn:hover{background:var(--paper); border-color:var(--line);}
+  .sidenav-cat-btn.active{background:var(--navy-800); color:#fff;}
+  .cat-code{
+    font-family:'IBM Plex Mono'; font-size:10px; font-weight:600; padding:2px 6px; border-radius:5px;
+    background:var(--lime-100); color:var(--lime-600); flex-shrink:0;
+  }
+  .sidenav-cat-btn.active .cat-code{background:var(--lime-500); color:var(--navy-900);}
+
+  .sidenav-items{margin:4px 0 4px 14px; padding-left:14px; border-left:2px solid var(--line); display:none;}
+  .sidenav-items.open{display:block;}
+  .sidenav-item-btn{
+    display:block; width:100%; text-align:left; padding:7px 10px; margin:2px 0; border-radius:8px;
+    background:transparent; border:none; cursor:pointer; font-size:13px; color:var(--ink-soft);
+  }
+  .sidenav-item-btn:hover{background:var(--paper); color:var(--ink);}
+  .sidenav-item-btn.active{background:var(--lime-100); color:var(--navy-800); font-weight:600;}
+
+  .sidenav-footer-note{
+    margin-top:18px; padding:14px; border-radius:10px; background:var(--paper); border:1px dashed var(--line);
+    font-size:12px; color:var(--ink-faint); line-height:1.5;
+  }
+
+  /* ===== Home ===== */
+  .home-hero{
+    background:var(--navy-800); color:#fff; border-radius:20px; padding:40px 36px; margin-bottom:28px;
+    position:relative; overflow:hidden;
+  }
+  .home-hero::after{
+    content:""; position:absolute; right:-40px; top:-40px; width:220px; height:220px; border-radius:50%;
+    background:radial-gradient(circle, rgba(169,194,63,.28), transparent 70%);
+  }
+  .home-hero h1{font-size:32px; max-width:560px; position:relative;}
+  .home-hero p{margin-top:10px; color:#c4cbdc; max-width:520px; font-size:15px; line-height:1.6; position:relative;}
+  .hero-badge{
+    display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono'; font-size:11px;
+    background:rgba(169,194,63,.16); color:var(--lime-500); padding:5px 10px; border-radius:999px; margin-bottom:14px;
+  }
+
+  .cat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .cat-card{
+    background:var(--paper); border-radius:var(--radius); border:1px solid var(--line);
+    padding:22px; cursor:pointer; box-shadow:var(--shadow-sm); position:relative; overflow:hidden;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .cat-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-md);}
+  .cat-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--lime-500);}
+  .cat-card .code-chip{
+    font-family:'IBM Plex Mono'; font-size:11px; font-weight:600; color:var(--navy-700);
+    background:var(--lime-100); padding:3px 8px; border-radius:6px; display:inline-block; margin-bottom:12px;
+  }
+  .cat-card h3{font-size:18px; color:var(--navy-900);}
+  .cat-card p{font-size:13px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+  .cat-card .count{margin-top:14px; font-size:12px; color:var(--ink-faint); display:flex; align-items:center; gap:6px;}
+
+  /* ===== Item header ===== */
+  .breadcrumb{font-size:12px; color:var(--ink-faint); margin-bottom:14px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .breadcrumb a{color:var(--navy-700); font-weight:600;}
+  .breadcrumb a:hover{text-decoration:underline;}
+
+  .item-header{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px 28px; margin-bottom:26px; box-shadow:var(--shadow-sm);
+  }
+  .item-header .eyebrow{
+    font-family:'IBM Plex Mono'; font-size:11px; font-weight:600; color:var(--lime-600);
+    text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; display:flex; gap:8px; align-items:center;
+  }
+  .item-header h2{font-size:26px; color:var(--navy-900);}
+  .item-header .desc{margin-top:8px; color:var(--ink-soft); font-size:14px; line-height:1.6; max-width:720px;}
+  .equip-tags{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;}
+  .equip-tag{
+    font-family:'IBM Plex Mono'; font-size:11px; font-weight:600; color:var(--navy-700);
+    background:var(--cream-50); border:1px solid var(--line); padding:4px 9px; border-radius:6px;
+  }
+
+  /* ===== Steps ===== */
+  .steps{display:flex; flex-direction:column; gap:0;}
+  .step{
+    display:flex; gap:18px; position:relative; padding-bottom:26px;
+  }
+  .step:not(:last-child)::before{
+    content:""; position:absolute; left:23px; top:52px; bottom:0; width:2px; background:var(--line);
+  }
+  .step-tag{
+    flex-shrink:0; width:48px; height:40px; position:relative;
+    background:var(--navy-800); border-radius:6px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:'IBM Plex Mono'; font-weight:600; font-size:15px;
+    box-shadow:var(--shadow-sm);
+  }
+  .step-tag::before{
+    content:""; position:absolute; left:-5px; top:50%; transform:translateY(-50%);
+    width:9px; height:9px; border-radius:50%; background:var(--cream-50); border:2px solid var(--navy-800);
+  }
+  .step-card{
+    flex:1; background:var(--paper); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; box-shadow:var(--shadow-sm);
+  }
+  .step-card-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .step-icon{width:20px; height:20px; color:var(--navy-700); flex-shrink:0;}
+  .step-card h4{font-size:15px; color:var(--navy-900);}
+  .step-card .body{font-size:13.5px; color:var(--ink-soft); line-height:1.6;}
+  .step-card .body code{
+    font-family:'IBM Plex Mono'; background:var(--lime-100); color:var(--navy-800);
+    padding:1px 6px; border-radius:4px; font-size:12.5px;
+  }
+  .step-card ul{margin:8px 0 0; padding-left:18px;}
+  .step-card ul li{font-size:13.5px; color:var(--ink-soft); margin-bottom:4px; line-height:1.5;}
+
+  .note-box{
+    margin-top:12px; padding:10px 12px; border-radius:9px; background:var(--lime-100);
+    border-left:3px solid var(--lime-600); font-size:12.5px; color:#4a5a2a; line-height:1.55;
+  }
+  .note-box b{color:var(--navy-800);}
+
+  .alert-box{
+    margin-top:26px; padding:16px 18px; border-radius:12px; background:var(--red-bg);
+    border:1px solid #f0c6c1;
+  }
+  .alert-box .alert-head{
+    display:flex; align-items:center; gap:8px; font-weight:700; color:var(--red-500); font-size:13px;
+    text-transform:uppercase; letter-spacing:.04em; margin-bottom:8px;
+  }
+  .alert-box ul{margin:0; padding-left:18px;}
+  .alert-box li{font-size:13px; color:#7a2e28; margin-bottom:5px; line-height:1.55;}
+
+  .section-block{margin-bottom:34px;}
+  .section-block-head{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+  .section-num{
+    font-family:'IBM Plex Mono'; font-weight:600; font-size:12px; color:var(--navy-900);
+    background:var(--lime-500); padding:4px 9px; border-radius:6px;
+  }
+  .section-block-head h3{font-size:19px; color:var(--navy-900);}
+
+  /* ===== Empty / no results ===== */
+  .empty-state{text-align:center; padding:60px 20px; color:var(--ink-faint);}
+  .empty-state svg{width:36px; height:36px; margin-bottom:10px; opacity:.5;}
+
+  /* ===== Footer ===== */
+  footer{
+    text-align:center; padding:26px; color:var(--ink-faint); font-size:12px; border-top:1px solid var(--line);
+    max-width:1280px; margin:0 auto;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width:900px){
+    .cat-grid{grid-template-columns:1fr;}
+    .layout{flex-direction:column; padding:16px;}
+    aside.sidenav{
+      width:100%; position:fixed; top:0; left:0; height:100vh; background:var(--cream-50); z-index:50;
+      padding:20px; transform:translateX(-100%); transition:transform .25s ease; overflow-y:auto;
+    }
+    aside.sidenav.open{transform:translateX(0);}
+    .sidenav-inner{position:static;}
+    .menu-toggle{display:flex;}
+    .search-wrap{max-width:none;}
+    .brand-text .sub{display:none;}
+    .close-nav{display:block; margin-bottom:14px; background:var(--navy-800); color:#fff; border:none; border-radius:8px; padding:8px 12px; font-size:13px; cursor:pointer;}
+  }
+  @media (min-width:901px){ .close-nav{display:none;} }
+</style>
+</head>
+<body>
+<div class="circuit-bg"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="#" class="brand" onclick="goHome(); return false;">
+      <span class="brand-mark"><span class="h">H</span><span class="r">r</span><span class="u">u</span></span>
+      <span class="brand-text">
+        <span class="tag">Equipo Médico</span>
+        <span class="sub">Guía de referencia técnica</span>
+      </span>
+    </a>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="Buscar procedimiento, equipo o paso…">
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidenav" id="sidenav">
+    <button class="close-nav" onclick="toggleMenu(false)">Cerrar ✕</button>
+    <div class="sidenav-inner" id="sidenavInner"></div>
+  </aside>
+  <main class="content" id="content"></main>
+</div>
+
+<footer>Material de referencia elaborado para técnicos nuevos en ingeniería de servicio biomédico. Esta guía complementa la práctica supervisada, no la sustituye.</footer>
+
+<script>
+/* ============ ICONS ============ */
+const ICONS = {
+  barcode:`<path d="M4 4v16M8 4v16M11 4v16M15 4v16M18 4v16M21 4v16" stroke-linecap="round"/>`,
+  box:`<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/>`,
+  power:`<path d="M12 3v8" stroke-linecap="round"/><path d="M7 5.5a8 8 0 1 0 10 0"/>`,
+  clock:`<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/>`,
+  activity:`<path d="M3 12h4l2-7 4 14 2-7h6" stroke-linecap="round" stroke-linejoin="round"/>`,
+  clipboard:`<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" /><path d="M9 11h6M9 15h6" stroke-linecap="round"/>`,
+  wrench:`<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l2 2 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2 2.3-2.3z"/>`,
+  spray:`<path d="M9 3h4v3H9z"/><path d="M11 6v4"/><path d="M6 22l2-9a3 3 0 0 1 3-2h0a3 3 0 0 1 3 2l2 9z"/><path d="M15 9l2-1M16 12l2.5-.5M15 6l2-2"/>`,
+  cpu:`<rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M7 4l1.5 1.5M17 4l-1.5 1.5M7 20l1.5-1.5M17 20l-1.5-1.5" stroke-linecap="round"/>`,
+  refresh:`<path d="M20 11A8 8 0 0 0 6.3 6.3L4 8.5" stroke-linecap="round"/><path d="M4 4v4.5H8.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 13a8 8 0 0 0 13.7 4.7L20 15.5" stroke-linecap="round"/><path d="M20 20v-4.5h-4.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+  gear:`<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>`,
+  download:`<path d="M12 3v12" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 19h16" stroke-linecap="round"/>`,
+  usb:`<circle cx="7" cy="17" r="2"/><circle cx="17" cy="6" r="2"/><path d="M7 15V9a2 2 0 0 1 2-2h4M17 8v5a2 2 0 0 1-2 2h-1"/>`,
+  folder:`<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/>`,
+  check:`<path d="M4 12l6 6L20 6" stroke-linecap="round" stroke-linejoin="round"/>`,
+  drive:`<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 12h18"/><circle cx="7" cy="16" r="1"/>`,
+  plug:`<path d="M9 2v6M15 2v6" stroke-linecap="round"/><path d="M7 8h10v4a5 5 0 0 1-10 0V8z"/><path d="M12 17v5" stroke-linecap="round"/>`,
+  rotate:`<path d="M21 12a9 9 0 1 1-3-6.7" stroke-linecap="round"/><path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round"/>`,
+  terminal:`<path d="M4 4h16v16H4z"/><path d="M8 9l3 3-3 3M13 15h4" stroke-linecap="round" stroke-linejoin="round"/>`,
+  network:`<circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M12 7v6M12 13l-5.5 5M12 13l5.5 5"/>`,
+  key:`<circle cx="8" cy="15" r="4"/><path d="M10.5 12.5L20 3M17 6l2 2M14 9l2 2" stroke-linecap="round"/>`,
+  eye:`<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>`,
+  image:`<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/>`,
+  droplet:`<path d="M12 2c4 5 7 8.5 7 12.5A7 7 0 0 1 5 14.5C5 10.5 8 7 12 2z"/>`,
+  waveform:`<path d="M2 12h3l2-7 3 14 3-9 2 5h5l2-3" stroke-linecap="round" stroke-linejoin="round"/>`,
+  ruler:`<rect x="3" y="8" width="18" height="8" rx="1"/><path d="M7 8v3M11 8v3M15 8v3M19 8v3" stroke-linecap="round"/>`,
+  alert:`<path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4" stroke-linecap="round"/><circle cx="12" cy="17" r="0.5" fill="currentColor"/>`,
+  package:`<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>`,
+};
+function icon(name, cls=""){
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||ICONS.gear}</svg>`;
+}
+
+/* ============ DATA ============ */
+const DATA = {
+  mantenimiento:{
+    code:"PM", label:"Mantenimiento Preventivo",
+    desc:"Procedimientos de limpieza, inspección y verificación periódica de equipos.",
+    items:[
+      {
+        id:"drypix-mant", title:"Impresora de Rayos X Drypix Lite", brand:"FUJIFILM",
+        desc:"Mantenimiento preventivo de la impresora térmica seca Drypix Lite.",
+        tags:["Drypix Lite","Impresora seca"],
+        steps:[
+          {icon:"power", title:"Energizar y encender el equipo", body:"Realizar una prueba de calibración/impresión para evaluar su estado y funcionamiento."},
+          {icon:"wrench", title:"Desarmar el equipo", body:"Desarmar cuidadosamente, identificando la ubicación de cada componente y sus tornillos."},
+          {icon:"cpu", title:"Limpiar la tarjeta madre", body:"Retirar la cubierta protectora, sujetar el ventilador y aplicar aire comprimido a una distancia segura para evitar daños por condensación."},
+          {icon:"spray", title:"Limpiar los demás componentes", body:"Incluyendo ventiladores, cabezales, rodillos y cubiertas."},
+          {icon:"refresh", title:"Reensamblar el equipo", body:"Ejecutar nuevamente la prueba de calibración/impresión para verificar su correcto funcionamiento."},
+          {icon:"gear", title:"Ingresar al modo de servicio", body:"Restablecer a cero el contador interno del inventario de películas."},
+        ]
+      },
+      {
+        id:"nx700-mant", title:"Química Sanguínea NX700", brand:"FUJIFILM",
+        desc:"Mantenimiento preventivo del analizador de química sanguínea NX700.",
+        tags:["NX700","Química sanguínea"],
+        steps:[
+          {icon:"eye", title:"Inspección física", body:"Realizar inspección física del equipo y evaluar el actual nivel de suciedad exterior."},
+          {icon:"clipboard", title:"Solicitar apoyo del químico responsable", body:"Ejecutar una prueba de funcionamiento y corroborar que el equipo esté operando de manera óptima."},
+          {icon:"activity", title:"Prueba de fugas y lectura de placa de referencia", body:"Verificar el porcentaje de suciedad acumulada en la placa del equipo."},
+          {icon:"spray", title:"Limpieza externa e interna completa", body:"Desenergizar y desarmar el equipo. Incluye ventiladores, filtros, piezas internas y la placa negra de referencia."},
+          {icon:"refresh", title:"Armar nuevamente el equipo", body:"Encenderlo y correr la muestra de prueba, confirmando que funcione correctamente tras el mantenimiento."},
+          {icon:"check", title:"Verificar el nuevo porcentaje", body:"Comparar con la lectura inicial.", note:"Si el mantenimiento se realizó correctamente, el porcentaje deberá ubicarse entre <b>0% y 5%</b>."},
+        ]
+      },
+      {
+        id:"drypix-servicio", title:"Acceso al Modo de Servicio", brand:"FUJIFILM · Drypix Lite",
+        desc:"Procedimiento para ingresar al modo de servicio vía escritorio virtual y realizar tareas de mantenimiento (inventario de películas, asignación de slots).",
+        tags:["Drypix Lite","Escritorio virtual","VirtualBox"],
+        steps:[
+          {icon:"plug", title:"Conectar la impresora", body:"Energizar la FUJIFILM DRYPIX Lite y esperar a que finalice su arranque. Conectar la computadora directamente a la impresora mediante un cable Ethernet."},
+          {icon:"gear", title:"Configurar el escritorio virtual", body:"Abrir Oracle VirtualBox y verificar que el adaptador de red esté configurado como:", list:["Adaptador puente (Bridged Adapter)","Intel(R) Ethernet Connection","Intel PRO/1000 MT Desktop (82540EM)"]},
+          {icon:"terminal", title:"Iniciar Windows 7 y verificar la conexión", body:"Iniciar el escritorio virtual. Abrir CMD y ejecutar <code>ipconfig /all</code>. Confirmar que la dirección IP pertenezca a la misma red que la impresora (no deben ser exactamente iguales).", note:"La dirección IP predeterminada de fábrica de la DRYPIX Lite es <b>172.16.1.30</b>"},
+          {icon:"network", title:"Comprobar la comunicación", body:"Ejecutar en el command prompt: <code>ping 172.16.1.30</code>. Verificar que exista respuesta de la impresora y que la conexión sea exitosa."},
+          {icon:"key", title:"Iniciar sesión", body:"Abrir la plataforma de servicio de FUJIFILM e iniciar sesión con las credenciales autorizadas. Esperar a que cargue la interfaz de mantenimiento.", note:"Usuario: <b>dryprinter</b> · Contraseña: <b>fujifilm</b>"},
+          {icon:"check", title:"Ejecutar y finalizar mantenimiento", body:"Realizar el procedimiento requerido (inventario de películas, asignación de slots).", list:["Verificar que los cambios se hayan aplicado correctamente","Cerrar sesión (Logout) para guardar las modificaciones","Apagar el escritorio virtual Windows 7"]},
+        ]
+      }
+    ]
+  },
+  software:{
+    code:"SW", label:"Recarga de Software",
+    desc:"Procedimientos para actualizar o reinstalar el software de sistemas de ultrasonido.",
+    items:[
+      {
+        id:"consona-serie", title:"Mindray · Serie Consona", brand:"MINDRAY",
+        desc:"Recarga de software para equipos de ultrasonido de la serie Consona.",
+        tags:["Serie Consona","USB FAT32"],
+        steps:[
+          {icon:"download", title:"Descargar el software", body:"Seleccionar y descargar la versión de software compatible y que se necesita para el equipo correspondiente."},
+          {icon:"usb", title:"Formatear el USB", body:"Formatear el dispositivo de almacenamiento USB a formato FAT32."},
+          {icon:"folder", title:"Preparar los archivos", body:"Descomprimir los archivos y pasar el archivo principal del sistema operativo a la raíz de la USB."},
+          {icon:"droplet", title:"Colocar archivos del Doppler", body:"Colocar los archivos del programa doppler en la carpeta que está vacía y con el nombre de \"Doppler\"."},
+          {icon:"wrench", title:"Check tool", body:"Realizar un \"Check tool\" 2 veces."},
+          {icon:"drive", title:"Respaldar datos (si aplica)", body:"Si es necesario, transferir a una unidad de almacenamiento externa los datos (estudios, pacientes, etc.) presentes en el disco duro del ultrasonido."},
+          {icon:"usb", title:"Colocar la USB", body:"Apagar el equipo y colocar la USB en el puerto correspondiente.", note:"Observando el equipo por la parte de atrás, es el puerto de la <b>derecha</b>."},
+          {icon:"power", title:"Energizar y seleccionar opción", body:"Encenderlo y una vez que entre el programa, seleccionar la opción que corresponda: formatear el disco duro por completo o conservar los datos de este."},
+          {icon:"gear", title:"Ejecutar el programa", body:"Encender el equipo, seleccionar la opción dejar correr el programa, estando atento a las indicaciones que presenta el equipo durante el proceso."},
+          {icon:"rotate", title:"Finalizar el proceso", body:"Una vez terminado el proceso, apagar el equipo, esperar aproximadamente 15 segundos, retirar la USB y encender de nuevo."},
+          {icon:"check", title:"Corroborar la instalación", body:"Una vez encendido el equipo, corroborar que se instaló correctamente la versión del software entrando con la tecla <code>F10</code> y en el apartado \"about\"."},
+        ]
+      },
+      {
+        id:"consona-n9", title:"Mindray · Consona N9", brand:"MINDRAY",
+        desc:"Recarga de software específica para el equipo Consona N9.",
+        tags:["Consona N9","USB FAT32"],
+        steps:[
+          {icon:"download", title:"Descargar el software", body:"Seleccionar y descargar la versión de software compatible y que se necesita para el equipo correspondiente."},
+          {icon:"usb", title:"Formatear el USB", body:"Formatear el dispositivo de almacenamiento USB a formato FAT32."},
+          {icon:"folder", title:"Preparar los archivos", body:"Pasar el archivo principal del sistema operativo a la raíz de la USB."},
+          {icon:"droplet", title:"Colocar los demás archivos", body:"Colocar los demás archivos en la carpeta \"Doppler\"."},
+          {icon:"wrench", title:"Check tool", body:"Realizar un \"Check tool\" 2 veces."},
+          {icon:"drive", title:"Respaldar datos (si aplica)", body:"Si es necesario, transferir a una unidad de almacenamiento externa los datos (estudios, pacientes, etc.) presentes en el disco duro del ultrasonido."},
+          {icon:"usb", title:"Colocar la USB", body:"Apagar el equipo y colocar la USB en el puerto correspondiente.", note:"Observando el equipo por la parte de atrás, es el puerto de la <b>derecha</b>."},
+          {icon:"power", title:"Energizar y seleccionar opción", body:"Energizar el equipo y una vez que entre el programa, seleccionar la opción que corresponda: formatear el disco duro por completo o conservar los datos de este."},
+          {icon:"gear", title:"Ejecutar el programa", body:"Una vez seleccionada la opción, dejar correr el programa y estar atento a las indicaciones que presenta el equipo durante el proceso."},
+          {icon:"rotate", title:"Finalizar el proceso", body:"Una vez terminado el proceso, se reinicia el equipo, se esperan aproximadamente 15 segundos y se enciende de nuevo."},
+          {icon:"check", title:"Corroborar la instalación", body:"Corroborar que se instaló correctamente la versión del software entrando con la tecla <code>F10</code> y en el apartado \"about\"."},
+        ]
+      }
+    ]
+  },
+  revision:{
+    code:"QA", label:"Revisión de Equipo",
+    desc:"Procedimientos de verificación funcional antes de liberar un equipo.",
+    items:[
+      {
+        id:"monitoreo-paciente", title:"Equipo de Monitoreo de Paciente", brand:"UMEC10 · UMEC12 · epM12 · epM10",
+        desc:"Revisión funcional completa antes de liberar un monitor de paciente.",
+        tags:["UMEC10","UMEC12","epM12","epM10"],
+        steps:[
+          {icon:"barcode", title:"Verificación inicial", body:"Abrir la caja y confirmar que el número de serie del equipo coincide con el indicado en el empaque."},
+          {icon:"box", title:"Revisión de accesorios", body:"Revisar la caja de accesorios: confirmar que estén completos y en buen estado físico."},
+          {icon:"power", title:"Encendido y configuración", body:"Energizar y encender el equipo. Calibrar la pantalla táctil (si aplica) y actualizar fecha y hora al momento de la revisión."},
+          {icon:"activity", title:"Prueba con simulador de paciente", body:"Conectar el simulador de paciente y verificar la calibración de cada parámetro.", list:["ECG","SpO2","Temperatura","PANI","PAI","Capnografía"], note:"Realizar mínimo <b>5 mediciones por parámetro</b>, por encima y por debajo del rango normal, con un margen de tolerancia de <b>±3 unidades</b>."},
+          {icon:"clipboard", title:"Documentación y cierre", body:"Completar la hoja de revisión, indicando: estado de los accesorios, funcionalidad del equipo y confirmación de la prueba con simulador de paciente."},
+        ]
+      },
+      {
+        id:"ultrasonido-imagen", title:"Revisión de Imagen de Ultrasonido", brand:"General",
+        desc:"Revisión introductoria de los cinco modos de imagen y funcionamiento de un equipo de ultrasonido.",
+        tags:["2D / Modo B","Color Doppler","PW","M-Mode"],
+        sections:[
+          {
+            num:"01", title:"Inspección Física",
+            groups:[
+              {icon:"eye", title:"Inspección de transductores", list:[
+                "Revisar cables en toda su longitud (sin dobleces ni cortes)",
+                "Verificar lente acústica: sin grietas, delaminación ni desgaste",
+                "Confirmar sellos e integridad del cuerpo del transductor",
+                "Inspeccionar conector: pines rectos, sin corrosión",
+              ]},
+              {icon:"droplet", title:"Transductores volumétricos", body:"Para transductores volumétricos (endocavitarios o convencionales), revisar además que el aceite dieléctrico interno no presente fugas: buscar residuos húmedos o aceitosos alrededor de la carcasa, sellos y en la zona de unión con el cable.", note:"Una fuga puede dejar burbujas de aire dentro del housing, causando artefactos o pérdida de imagen en esa zona del barrido."},
+              {icon:"image", title:"Inspección del equipo de ultrasonido", list:[
+                "Carcasa/consola: sin grietas, tornillería completa, ruedas y frenos funcionales",
+                "Cable de alimentación y tierra física: sin daño visible",
+                "Pantalla: sin píxeles muertos, líneas o manchas",
+                "Panel de control/trackball: teclas y perillas responden sin trabarse",
+                "Filtros de aire: limpios, sin exceso de polvo",
+              ]},
+            ],
+            alerts:["Cable de transductor con hilos expuestos o continuidad intermitente","Corrosión visible en conectores o pines doblados","Olor a quemado o signos de sobrecalentamiento en la consola","Tierra física dañada o ausente (riesgo eléctrico para el paciente)"]
+          },
+          {
+            num:"02", title:"Revisión de Imagen Bidimensional (Modo B)",
+            groups:[
+              {icon:"image", title:"Verificación de la imagen", list:[
+                "Escanear un phantom (o superficie de prueba) y confirmar formación de imagen sin artefactos anómalos",
+                "Ajustar ganancia y TGC: la señal debe responder de forma uniforme en toda la profundidad",
+                "Mover el foco: debe desplazarse y mejorar la resolución en el punto seleccionado",
+                "Confirmar zoom, freeze y medición de distancia básica",
+              ], note:"Al probar los presets clínicos (abdominal, cardiaco, vascular, etc.), verifica que cada uno cargue correctamente y que la profundidad de escaneo (depth) permita aumentar/disminuir sin pérdida de imagen."},
+            ],
+            alerts:["Líneas verticales negras constantes en la imagen (elemento del transductor dañado)","Zonas oscuras o \"drop-out\" de señal sin explicación","Imagen que no responde a ajustes de Ganancia/TGC"]
+          },
+          {
+            num:"03", title:"Revisión de funcionamiento de Doppler (C)",
+            groups:[
+              {icon:"droplet", title:"Verificación del color Doppler", list:[
+                "Activar Color Doppler y confirmar que el cuadro de color se posicione/redimensione correctamente",
+                "Verificar que el color aparezca dentro del vaso/flujo, sin \"sangrado\" hacia tejido estático",
+                "Ajustar escala de velocidad (PRF): el aliasing debe comportarse de forma predecible",
+                "Confirmar inversión de color (rojo/azul) según dirección de flujo",
+              ], note:"La ganancia de color es el ajuste más sensible del modo C: demasiado alta genera ruido de color disperso (\"color flash\"); muy baja no detecta flujo real. Si el equipo cuenta con Power Doppler, revísalo también como modo complementario para flujo de baja velocidad."},
+            ],
+            alerts:["Ruido de color aleatorio en toda la pantalla que no se corrige bajando ganancia (posible interferencia eléctrica)","Color desalineado respecto a la imagen 2D","Ausencia total de color en zonas con flujo confirmado"]
+          },
+          {
+            num:"04", title:"Revisión de modo Doppler Pulsado (PW)",
+            groups:[
+              {icon:"waveform", title:"Verificación del espectro PW", list:[
+                "Posicionar el volumen de muestra sobre el vaso/flujo de interés",
+                "Confirmar generación del trazo espectral sincronizado con audio Doppler",
+                "Ajustar ángulo Doppler (corrección de insonación) para cálculo correcto de velocidad",
+                "Probar escala (PRF) y línea base sin que se corte el espectro (aliasing)",
+              ], note:"El filtro de pared (wall filter) debe eliminar señales de baja frecuencia (movimiento de tejido) sin borrar señal real de flujo. El audio Doppler debe variar en tono según la velocidad — es una forma rápida de detectar si el problema es de imagen o de audio."},
+            ],
+            alerts:["Trazo espectral sin audio (o viceversa): posible falla del sistema de audio, no del transductor","Ángulo Doppler no ajustable (afecta directamente el cálculo de velocidad)","Espectro intermitente o con cortes sin cambio de escala"]
+          },
+          {
+            num:"05", title:"Revisión de funcionamiento de modo de medición (M)",
+            groups:[
+              {icon:"ruler", title:"Verificación del trazo M-Mode", list:[
+                "Posicionar cursor sobre estructura en movimiento y confirmar trazo continuo en el eje del tiempo",
+                "Ajustar velocidad de barrido (sweep speed): lenta/rápida, reflejada correctamente en el trazo",
+                "Confirmar sincronización entre imagen 2D y trazo M (la línea del cursor corresponde exactamente a lo graficado)",
+                "Probar modo combinado B + M (imagen y trazo simultáneos)",
+              ], note:"El M-Mode es muy sensible a fallas de temporización (timing) interna del equipo. Prueba las herramientas de medición sobre el trazo (distancia, tiempo, frecuencia cardiaca) comparando contra un valor conocido si hay phantom calibrado."},
+            ],
+            alerts:["Trazo que se ve \"temblando\" o desalineado del punto de origen (posible falla de timing interno)","Interrupciones o \"saltos\" en el trazo sin causa aparente","Mediciones que no coinciden con valores de referencia conocidos"]
+          },
+        ]
+      }
+    ]
+  }
+};
+
+/* ============ STATE & ROUTING ============ */
+let state = {cat:null, item:null};
+
+function goHome(){ state = {cat:null, item:null}; render(); toggleMenu(false); }
+function openCat(catKey){
+  state.cat = catKey; state.item = null;
+  render();
+}
+function openItem(catKey, itemId){
+  state.cat = catKey; state.item = itemId;
+  render();
+  toggleMenu(false);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function toggleMenu(force){
+  const sn = document.getElementById('sidenav');
+  const open = force !== undefined ? force : !sn.classList.contains('open');
+  sn.classList.toggle('open', open);
+}
+document.getElementById('menuToggle').addEventListener('click', ()=>toggleMenu());
+
+/* ============ RENDER: SIDENAV ============ */
+function renderSidenav(){
+  const el = document.getElementById('sidenavInner');
+  let html = "";
+  for(const key in DATA){
+    const cat = DATA[key];
+    const isActiveCat = state.cat === key;
+    html += `<div class="sidenav-section">
+      <button class="sidenav-cat-btn ${isActiveCat?'active':''}" onclick="openCat('${key}')">
+        <span class="cat-code">${cat.code}</span>${cat.label}
+      </button>
+      <div class="sidenav-items ${isActiveCat?'open':''}">
+        ${cat.items.map(it=>`<button class="sidenav-item-btn ${state.item===it.id?'active':''}" onclick="openItem('${key}','${it.id}')">${it.title}</button>`).join('')}
+      </div>
+    </div>`;
+  }
+  html += `<div class="sidenav-footer-note">Contenido basado en los manuales de mantenimiento, recarga de software y revisión de equipo de HRU. Úsalo como apoyo antes de la práctica supervisada.</div>`;
+  el.innerHTML = html;
+}
+
+/* ============ RENDER: STEP CARD ============ */
+function renderStep(s, i){
+  return `<div class="step">
+    <div class="step-tag">${i+1}</div>
+    <div class="step-card">
+      <div class="step-card-head">
+        ${icon(s.icon,'step-icon')}
+        <h4>${s.title}</h4>
+      </div>
+      ${s.body?`<div class="body">${s.body}</div>`:""}
+      ${s.list?`<ul>${s.list.map(l=>`<li>${l}</li>`).join('')}</ul>`:""}
+      ${s.note?`<div class="note-box">${s.note}</div>`:""}
+    </div>
+  </div>`;
+}
+
+function renderSectionGroup(g){
+  return `<div class="step-card" style="margin-bottom:12px;">
+    <div class="step-card-head">${icon(g.icon,'step-icon')}<h4>${g.title}</h4></div>
+    ${g.body?`<div class="body">${g.body}</div>`:""}
+    ${g.list?`<ul>${g.list.map(l=>`<li>${l}</li>`).join('')}</ul>`:""}
+    ${g.note?`<div class="note-box">${g.note}</div>`:""}
+  </div>`;
+}
+
+/* ============ RENDER: ITEM DETAIL ============ */
+function renderItem(catKey, item){
+  const cat = DATA[catKey];
+  let html = `<div class="breadcrumb"><a href="#" onclick="goHome();return false;">Inicio</a> / <a href="#" onclick="openCat('${catKey}');return false;">${cat.label}</a> / ${item.title}</div>`;
+
+  html += `<div class="item-header">
+    <div class="eyebrow">${icon('gear','')} ${cat.code} · ${cat.label}</div>
+    <h2>${item.title}</h2>
+    <div class="desc">${item.desc}</div>
+    <div class="equip-tags">${item.tags.map(t=>`<span class="equip-tag">${t}</span>`).join('')}</div>
+  </div>`;
+
+  if(item.steps){
+    html += `<div class="steps">${item.steps.map((s,i)=>renderStep(s,i)).join('')}</div>`;
+  }
+
+  if(item.sections){
+    item.sections.forEach(sec=>{
+      html += `<div class="section-block">
+        <div class="section-block-head"><span class="section-num">${sec.num}</span><h3>${sec.title}</h3></div>
+        ${sec.groups.map(renderSectionGroup).join('')}
+        ${sec.alerts?`<div class="alert-box">
+          <div class="alert-head">${icon('alert','')} Alertas — escalar si observas</div>
+          <ul>${sec.alerts.map(a=>`<li>${a}</li>`).join('')}</ul>
+        </div>`:""}
+      </div>`;
+    });
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+/* ============ RENDER: CATEGORY LIST ============ */
+function renderCategory(catKey){
+  const cat = DATA[catKey];
+  let html = `<div class="breadcrumb"><a href="#" onclick="goHome();return false;">Inicio</a> / ${cat.label}</div>`;
+  html += `<div class="item-header">
+    <div class="eyebrow">${cat.code} · Categoría</div>
+    <h2>${cat.label}</h2>
+    <div class="desc">${cat.desc}</div>
+  </div>`;
+  html += `<div class="cat-grid">${cat.items.map(it=>`
+    <div class="cat-card" onclick="openItem('${catKey}','${it.id}')">
+      <span class="code-chip">${it.brand}</span>
+      <h3>${it.title}</h3>
+      <p>${it.desc}</p>
+      <div class="count">${icon('check','')} ${it.steps ? it.steps.length+' pasos' : it.sections.length+' secciones'}</div>
+    </div>`).join('')}</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+/* ============ RENDER: HOME ============ */
+function renderHome(){
+  let html = `<div class="home-hero">
+    <div class="hero-badge">${icon('package','')} Guía de referencia · HRU</div>
+    <h1>Tu Aliado en Equipo Médico</h1>
+    <p>Consulta rápida de los procedimientos de mantenimiento preventivo, recarga de software y revisión de equipo médico. Diseñada como apoyo para técnicos nuevos en ingeniería de servicio biomédico.</p>
+  </div>`;
+  html += `<div class="cat-grid">`;
+  for(const key in DATA){
+    const cat = DATA[key];
+    const count = cat.items.length;
+    html += `<div class="cat-card" onclick="openCat('${key}')">
+      <span class="code-chip">${cat.code}</span>
+      <h3>${cat.label}</h3>
+      <p>${cat.desc}</p>
+      <div class="count">${icon('folder','')} ${count} ${count===1?'procedimiento':'procedimientos'}</div>
+    </div>`;
+  }
+  html += `</div>`;
+  document.getElementById('content').innerHTML = html;
+}
+
+/* ============ MAIN RENDER ============ */
+function render(){
+  renderSidenav();
+  if(state.item){
+    const cat = DATA[state.cat];
+    const item = cat.items.find(i=>i.id===state.item);
+    renderItem(state.cat, item);
+  } else if(state.cat){
+    renderCategory(state.cat);
+  } else {
+    renderHome();
+  }
+}
+
+/* ============ SEARCH ============ */
+function textOfItem(catKey, item){
+  let t = item.title+" "+item.desc+" "+item.tags.join(" ");
+  if(item.steps) t += " " + item.steps.map(s=>s.title+" "+(s.body||"")).join(" ");
+  if(item.sections) t += " " + item.sections.map(sec=>sec.title+" "+sec.groups.map(g=>g.title+" "+(g.body||"")+" "+(g.list||[]).join(" ")).join(" ")).join(" ");
+  return t.toLowerCase();
+}
+
+document.getElementById('searchInput').addEventListener('input', (e)=>{
+  const q = e.target.value.trim().toLowerCase();
+  if(!q){ render(); return; }
+  let results = [];
+  for(const catKey in DATA){
+    DATA[catKey].items.forEach(item=>{
+      if(textOfItem(catKey,item).includes(q)) results.push({catKey, item});
+    });
+  }
+  renderSidenav();
+  let html = `<div class="breadcrumb">Resultados para "<b>${e.target.value}</b>"</div>`;
+  if(results.length===0){
+    html += `<div class="empty-state">${icon('eye','')}<div>No se encontraron procedimientos que coincidan con tu búsqueda.</div></div>`;
+  } else {
+    html += `<div class="cat-grid">${results.map(r=>`
+      <div class="cat-card" onclick="openItem('${r.catKey}','${r.item.id}')">
+        <span class="code-chip">${DATA[r.catKey].code} · ${r.item.brand}</span>
+        <h3>${r.item.title}</h3>
+        <p>${r.item.desc}</p>
+      </div>`).join('')}</div>`;
+  }
+  document.getElementById('content').innerHTML = html;
+});
+
+/* ============ INIT ============ */
+render();
+</script>
+</body>
+</html>
