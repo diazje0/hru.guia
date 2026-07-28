@@ -165,7 +165,15 @@
   .item-header{
     background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
     padding:26px 28px; margin-bottom:26px; box-shadow:var(--shadow-sm);
+    display:flex; gap:24px; align-items:flex-start; justify-content:space-between;
   }
+  .item-header-text{flex:1; min-width:0;}
+  .item-header-media{
+    flex-shrink:0; width:180px; height:180px; border-radius:12px; overflow:hidden;
+    background:linear-gradient(160deg, var(--cream-50), #eceada);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+  }
+  .item-header-media img{width:100%; height:100%; object-fit:contain; padding:10px;}
   .item-header .eyebrow{
     font-family:'IBM Plex Mono'; font-size:11px; font-weight:600; color:var(--lime-600);
     text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; display:flex; gap:8px; align-items:center;
@@ -269,6 +277,8 @@
 
   /* ===== Responsive ===== */
   @media (max-width:900px){
+    .item-header{flex-direction:column-reverse;}
+    .item-header-media{width:100%; height:170px;}
     .cat-grid{grid-template-columns:1fr;}
     .layout{flex-direction:column; padding:16px;}
     aside.sidenav{
@@ -363,6 +373,7 @@ const DATA = {
         id:"drypix-mant", title:"Impresora de Rayos X Drypix Lite", brand:"FUJIFILM",
         desc:"Mantenimiento preventivo de la impresora térmica seca Drypix Lite.",
         tags:["Drypix Lite","Impresora seca"],
+        image:"images/drypix.png",
         pdf:"pdfs/drypix-mantenimiento.pdf",
         steps:[
           {icon:"power", title:"Energizar y encender el equipo", body:"Realizar una prueba de calibración/impresión para evaluar su estado y funcionamiento."},
@@ -377,6 +388,7 @@ const DATA = {
         id:"nx700-mant", title:"Química Sanguínea NX700", brand:"FUJIFILM",
         desc:"Mantenimiento preventivo del analizador de química sanguínea NX700.",
         tags:["NX700","Química sanguínea"],
+        image:"images/nx700.png",
         pdf:"pdfs/nx700-mantenimiento.pdf",
         steps:[
           {icon:"eye", title:"Inspección física", body:"Realizar inspección física del equipo y evaluar el actual nivel de suciedad exterior."},
@@ -391,6 +403,7 @@ const DATA = {
         id:"drypix-servicio", title:"Acceso al Modo de Servicio", brand:"FUJIFILM · Drypix Lite",
         desc:"Procedimiento para ingresar al modo de servicio vía escritorio virtual y realizar tareas de mantenimiento (inventario de películas, asignación de slots).",
         tags:["Drypix Lite","Escritorio virtual","VirtualBox"],
+        image:"images/drypix.png",
         pdf:"pdfs/drypix-modo-servicio.pdf",
         steps:[
           {icon:"plug", title:"Conectar la impresora", body:"Energizar la FUJIFILM DRYPIX Lite y esperar a que finalice su arranque. Conectar la computadora directamente a la impresora mediante un cable Ethernet."},
@@ -411,6 +424,7 @@ const DATA = {
         id:"consona-serie", title:"Mindray · Serie Consona", brand:"MINDRAY",
         desc:"Recarga de software para equipos de ultrasonido de la serie Consona. Este procedimiento aplica para todos los modelos de la serie, incluyendo el Consona N9.",
         tags:["Serie Consona","Incluye N9","USB FAT32"],
+        image:"images/consona.png",
         pdf:"pdfs/consona-recarga-software.pdf",
         steps:[
           {icon:"download", title:"Descargar el software", body:"Seleccionar y descargar la versión de software compatible y que se necesita para el equipo correspondiente."},
@@ -436,6 +450,7 @@ const DATA = {
         id:"monitoreo-paciente", title:"Equipo de Monitoreo de Paciente", brand:"UMEC10 · UMEC12 · epM12 · epM10",
         desc:"Revisión funcional completa antes de liberar un monitor de paciente.",
         tags:["UMEC10","UMEC12","epM12","epM10"],
+        image:"images/umec.png",
         pdf:"pdfs/monitoreo-revision.pdf",
         steps:[
           {icon:"barcode", title:"Verificación inicial", body:"Abrir la caja y confirmar que el número de serie del equipo coincide con el indicado en el empaque."},
@@ -449,6 +464,7 @@ const DATA = {
         id:"ultrasonido-imagen", title:"Revisión de Imagen de Ultrasonido", brand:"General",
         desc:"Revisión introductoria de los cinco modos de imagen y funcionamiento de un equipo de ultrasonido.",
         tags:["2D / Modo B","Color Doppler","PW","M-Mode"],
+        image:"images/ultrasonido.png",
         pdf:"pdfs/ultrasonido-revision-imagen.pdf",
         sections:[
           {
@@ -597,18 +613,21 @@ function renderItem(catKey, item){
   let html = `<div class="breadcrumb"><a href="#" onclick="goHome();return false;">Inicio</a> / <a href="#" onclick="openCat('${catKey}');return false;">${cat.label}</a> / ${item.title}</div>`;
 
   html += `<div class="item-header">
-    <div class="eyebrow">${icon('gear','')} ${cat.code} · ${cat.label}</div>
-    <h2>${item.title}</h2>
-    <div class="desc">${item.desc}</div>
-    <div class="equip-tags">${item.tags.map(t=>`<span class="equip-tag">${t}</span>`).join('')}</div>
-    ${item.pdf?`<div class="pdf-card">
-      <div class="pdf-icon">${icon('download','')}</div>
-      <div class="pdf-text">
-        <div class="lead">Esta es una guía con imágenes que puedes descargar por si la necesitas</div>
-        <div class="sub">Versión ilustrada en PDF de este procedimiento, con fotos y diagramas paso a paso.</div>
-      </div>
-      <a class="pdf-btn" href="${item.pdf}" download target="_blank" rel="noopener">${icon('download','')} Descargar PDF</a>
-    </div>`:""}
+    <div class="item-header-text">
+      <div class="eyebrow">${cat.code} · ${cat.label}</div>
+      <h2>${item.title}</h2>
+      <div class="desc">${item.desc}</div>
+      <div class="equip-tags">${item.tags.map(t=>`<span class="equip-tag">${t}</span>`).join('')}</div>
+      ${item.pdf?`<div class="pdf-card">
+        <div class="pdf-icon">${icon('download','')}</div>
+        <div class="pdf-text">
+          <div class="lead">Esta es una guía con imágenes que puedes descargar por si la necesitas</div>
+          <div class="sub">Versión ilustrada en PDF de este procedimiento, con fotos y diagramas paso a paso.</div>
+        </div>
+        <a class="pdf-btn" href="${item.pdf}" download target="_blank" rel="noopener">${icon('download','')} Descargar PDF</a>
+      </div>`:""}
+    </div>
+    ${item.image?`<div class="item-header-media"><img src="${item.image}" alt="${item.title}"></div>`:""}
   </div>`;
 
   if(item.steps){
